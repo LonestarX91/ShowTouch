@@ -1,0 +1,10 @@
+Package: com.lnx.showtouch
+Name: ShowTouch
+Depends: mobilesubstrate, org.thebigboss.libcolorpicker
+Architecture: iphoneos-arm
+Description: Shows where you touch the screen
+Maintainer: LonestarX
+Author: LonestarX
+Section: Tweaks
+Version: 1.0.0
+Installed-Size: 344

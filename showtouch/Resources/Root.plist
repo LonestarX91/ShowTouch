@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+      <key>cell</key><string>PSGroupCell</string>
+      <key>label</key><string>Settings - they apply on the fly, no respring needed.</string>
+    </dict>
+		<dict>
+			<key>cell</key><string>PSSwitchCell</string>
+			<key>default</key><false/>
+			<key>defaults</key><string>com.lnx.showtouch</string>
+			<key>label</key><string>Enable tweak</string>
+			<key>key</key><string>enabled</string>
+			<key>PostNotification</key><string>com.lnx.showtouch/ReloadPrefs</string>
+		</dict>
+		<dict>
+      <key>cell</key><string>PSGroupCell</string>
+      <key>label</key><string>Colors &amp; Size</string>
+    </dict>
+		<dict>
+      <key>cell</key><string>PSLinkCell</string>
+      <key>cellClass</key><string>PFSimpleLiteColorCell</string>
+      <key>label</key><string>Touch color</string>
+      <key>libcolorpicker</key>
+      <dict>
+        <key>defaults</key><string>com.lnx.showtouch.color</string>
+        <key>default</key><string>#ff0000</string>
+        <key>key</key><string>touchColor</string>
+        <key>fallback</key><string>#ff0000</string>
+        <key>alpha</key><true/>
+        <key>PostNotification</key><string>com.lnx.showtouch/colorChanged</string>
+      </dict>
+    </dict>
+		<dict>
+      <key>cell</key><string>PSLinkCell</string>
+      <key>cellClass</key><string>PFSimpleLiteColorCell</string>
+      <key>label</key><string>Ripple color</string>
+      <key>libcolorpicker</key>
+      <dict>
+        <key>defaults</key><string>com.lnx.showtouch.color</string>
+        <key>default</key><string>#ff0000</string>
+        <key>key</key><string>rippleColor</string>
+        <key>fallback</key><string>#ff0000</string>
+        <key>alpha</key><true/>
+        <key>PostNotification</key><string>com.lnx.showtouch/colorChanged</string>
+      </dict>
+    </dict>
+		<dict>
+			<key>cell</key><string>PSSliderCell</string>
+			<key>default</key><real>30</real>
+			<key>defaults</key><string>com.lnx.showtouch</string>
+			<key>key</key><string>touchSize</string>
+			<key>isSegmented</key><false/>
+			<key>showValue</key><true/>
+			<key>min</key><integer>0</integer>
+			<key>max</key><integer>50</integer>
+			<key>PostNotification</key><string>com.lnx.showtouch/ReloadPrefs</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>label</key><string>Contact &amp; Support</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSButtonCell</string>
+			<key>label</key><string>Show your support if you like it ! (Paypal)</string>
+			<key>icon</key><string>ppicon.png</string>
+			<key>action</key><string>openPaypal</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSButtonCell</string>
+			<key>label</key><string>Stalk me on Twitter</string>
+			<key>icon</key><string>twitter.png</string>
+			<key>action</key><string>openTwitter</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSButtonCell</string>
+			<key>icon</key><string>emailicon</string>
+			<key>action</key><string>sendMail</string>
+			<key>label</key><string>Found a bug or have a request?</string>
+		</dict>
+		<dict>
+			<key>cell</key><string>PSGroupCell</string>
+			<key>footerAlignment</key><integer>0</integer>
+			<key>label</key><string>Made by LonestarX © 2018</string>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>ShowTouch</string>
+</dict>
+</plist>
