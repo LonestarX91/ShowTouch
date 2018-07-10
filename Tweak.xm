@@ -80,7 +80,6 @@ static BOOL animatedTouch;
     animatedTouch = NO;
    }];
 }
-
 %end
 
 static void reloadColorPrefs() {
