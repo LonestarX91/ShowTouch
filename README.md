@@ -1,6 +1,8 @@
 # ShowTouch
 A tweak to show touching events on the screen
 
+My repo: https://repo.lonestarx.net/
+
 Any questions about it, I can answer quickly on the JB Discord server where you can find me daily: https://discord.gg/3uev38a
 
 Pull requests with improvement are welcome !
