@@ -1,5 +1,4 @@
 include $(THEOS)/makefiles/common.mk
-TWEAKNAMEPREFS_LIBRARIES = colorpicker
 
 BUNDLE_NAME = ShowTouch
 ShowTouch_FILES = SWTRootListController.m
@@ -7,6 +6,7 @@ ShowTouch_INSTALL_PATH = /Library/PreferenceBundles
 ShowTouch_FRAMEWORKS = UIKit
 ShowTouch_PRIVATE_FRAMEWORKS = Preferences
 ShowTouch_CFLAGS = -fobjc-arc
+ShowTouch_LIBRARIES = colorpicker
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 
