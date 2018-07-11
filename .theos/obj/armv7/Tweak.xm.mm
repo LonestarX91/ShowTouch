@@ -48,66 +48,66 @@ static void (*_logos_orig$_ungrouped$UITouch$_setLocation$preciseLocation$inWind
 
 static void _logos_method$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$(_LOGOS_SELF_TYPE_NORMAL UITouch* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, CGPoint point, CGPoint arg2, BOOL arg3) {
   _logos_orig$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$(self, _cmd, point, arg2, arg3);
-  NSLog(@"UITOUCH");
-  if (!touchWindow) {
-      touchWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, touchSize, touchSize)];
-  }
-  CGRect touchFrame = touchWindow.bounds;
-  touchFrame.size.width = touchFrame.size.height = touchSize;
-  touchWindow.bounds = touchFrame;
-  touchWindow.backgroundColor = touchColor;
-  touchWindow.center = point;
-  touchWindow.windowLevel = UIWindowLevelStatusBar + 10000;
-  touchWindow.userInteractionEnabled = NO;
-  touchWindow.layer.cornerRadius = touchWindow.bounds.size.width / 2;
-  touchWindow.hidden = NO;
-  if (!animatedTouch) {
-    animatedTouch = YES;
-    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:touchWindow.bounds cornerRadius:touchWindow.layer.cornerRadius];
-    [circleShape removeFromSuperlayer];
-    circleShape = [CAShapeLayer layer];
-    circleShape.bounds = touchWindow.bounds;
-    circleShape.path = path.CGPath;
-    circleShape.position = CGPointMake(touchSize/2, touchSize/2);
-    circleShape.fillColor = rippleColor.CGColor;
-    circleShape.opacity = 0;
-    circleShape.strokeColor = rippleColor.CGColor;
-    circleShape.lineWidth = 0.5;
-    circleShape.anchorPoint = CGPointMake(.5,.5);
-    circleShape.contentsGravity = @"center";
-    if (touchWindow.layer.sublayers.count == 0) {
-      [touchWindow.layer addSublayer:circleShape];
+  if (enabled) {
+    if (!touchWindow) {
+        touchWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, touchSize, touchSize)];
     }
-    [CATransaction begin];
-    [CATransaction setCompletionBlock:^{
-    }];
+    CGRect touchFrame = touchWindow.bounds;
+    touchFrame.size.width = touchFrame.size.height = touchSize;
+    touchWindow.bounds = touchFrame;
+    touchWindow.backgroundColor = touchColor;
+    touchWindow.center = point;
+    touchWindow.windowLevel = UIWindowLevelStatusBar + 10000;
+    touchWindow.userInteractionEnabled = NO;
+    touchWindow.layer.cornerRadius = touchWindow.bounds.size.width / 2;
+    touchWindow.hidden = NO;
+    if (!animatedTouch) {
+      animatedTouch = YES;
+      UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:touchWindow.bounds cornerRadius:touchWindow.layer.cornerRadius];
+      [circleShape removeFromSuperlayer];
+      circleShape = [CAShapeLayer layer];
+      circleShape.bounds = touchWindow.bounds;
+      circleShape.path = path.CGPath;
+      circleShape.position = CGPointMake(touchSize/2, touchSize/2);
+      circleShape.fillColor = rippleColor.CGColor;
+      circleShape.opacity = 0;
+      circleShape.strokeColor = rippleColor.CGColor;
+      circleShape.lineWidth = 0.5;
+      circleShape.anchorPoint = CGPointMake(.5,.5);
+      circleShape.contentsGravity = @"center";
+      if (touchWindow.layer.sublayers.count == 0) {
+        [touchWindow.layer addSublayer:circleShape];
+      }
+      [CATransaction begin];
+      [CATransaction setCompletionBlock:^{
+      }];
 
-    CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    scaleAnimation.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
-    scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(2, 1, 1)];
+      CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+      scaleAnimation.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+      scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(2, 1, 1)];
 
-    CABasicAnimation *alphaAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-    alphaAnimation.fromValue = @0.7;
-    alphaAnimation.toValue = @0;
+      CABasicAnimation *alphaAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+      alphaAnimation.fromValue = @0.7;
+      alphaAnimation.toValue = @0;
 
-    CAAnimationGroup *animation = [CAAnimationGroup animation];
-    animation.animations = @[scaleAnimation, alphaAnimation];
-    animation.duration = 0.5;
-    animation.repeatCount = 1;
-    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-    [circleShape addAnimation:animation forKey:nil];
-    [CATransaction commit];
-  }
-  if ([hideTimer isValid]) {
-    [hideTimer invalidate];
-    hideTimer = nil;
-  }
-  hideTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 repeats:NO block:^(NSTimer * _Nonnull timer) {
-    touchWindow.hidden = YES;
-    animatedTouch = NO;
-   }];
+      CAAnimationGroup *animation = [CAAnimationGroup animation];
+      animation.animations = @[scaleAnimation, alphaAnimation];
+      animation.duration = 0.5;
+      animation.repeatCount = 1;
+      animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+      [circleShape addAnimation:animation forKey:nil];
+      [CATransaction commit];
+    }
+    if ([hideTimer isValid]) {
+      [hideTimer invalidate];
+      hideTimer = nil;
+    }
+    hideTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 repeats:NO block:^(NSTimer * _Nonnull timer) {
+      touchWindow.hidden = YES;
+      animatedTouch = NO;
+     }];
+   }
 }
-
 
 
 static void reloadColorPrefs() {
