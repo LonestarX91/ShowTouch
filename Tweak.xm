@@ -20,7 +20,7 @@ static NSTimer *hideTimer;
 
 %hook UIWindow
 -(BOOL)_ignoresHitTest {
-  return self == touchWindow ? YES : %orig;
+  return (self == touchWindow) ? YES : %orig;
 }
 
 -(void)sendEvent:(UIEvent *)event {
