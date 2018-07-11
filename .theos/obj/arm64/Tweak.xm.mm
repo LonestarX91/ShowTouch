@@ -18,7 +18,6 @@ static UIColor *rippleColor;
 static BOOL enabled;
 static CGFloat touchSize;
 static NSTimer *hideTimer;
-static BOOL animatedTouch;
 
 
 #include <substrate.h>
@@ -41,72 +40,87 @@ static BOOL animatedTouch;
 #define _LOGOS_RETURN_RETAINED
 #endif
 
-@class UITouch; 
-static void (*_logos_orig$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$)(_LOGOS_SELF_TYPE_NORMAL UITouch* _LOGOS_SELF_CONST, SEL, CGPoint, CGPoint, BOOL); static void _logos_method$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$(_LOGOS_SELF_TYPE_NORMAL UITouch* _LOGOS_SELF_CONST, SEL, CGPoint, CGPoint, BOOL); 
+@class UIWindow; 
+static BOOL (*_logos_orig$_ungrouped$UIWindow$_ignoresHitTest)(_LOGOS_SELF_TYPE_NORMAL UIWindow* _LOGOS_SELF_CONST, SEL); static BOOL _logos_method$_ungrouped$UIWindow$_ignoresHitTest(_LOGOS_SELF_TYPE_NORMAL UIWindow* _LOGOS_SELF_CONST, SEL); static void (*_logos_orig$_ungrouped$UIWindow$sendEvent$)(_LOGOS_SELF_TYPE_NORMAL UIWindow* _LOGOS_SELF_CONST, SEL, UIEvent *); static void _logos_method$_ungrouped$UIWindow$sendEvent$(_LOGOS_SELF_TYPE_NORMAL UIWindow* _LOGOS_SELF_CONST, SEL, UIEvent *); 
 
-#line 22 "Tweak.xm"
+#line 21 "Tweak.xm"
 
-static void _logos_method$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$(_LOGOS_SELF_TYPE_NORMAL UITouch* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, CGPoint point, CGPoint arg2, BOOL arg3) {
-  _logos_orig$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$(self, _cmd, point, arg2, arg3);
+static BOOL _logos_method$_ungrouped$UIWindow$_ignoresHitTest(_LOGOS_SELF_TYPE_NORMAL UIWindow* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd) {
+  return self == touchWindow ? YES : _logos_orig$_ungrouped$UIWindow$_ignoresHitTest(self, _cmd);
+}
+
+static void _logos_method$_ungrouped$UIWindow$sendEvent$(_LOGOS_SELF_TYPE_NORMAL UIWindow* _LOGOS_SELF_CONST __unused self, SEL __unused _cmd, UIEvent * event) {
+  _logos_orig$_ungrouped$UIWindow$sendEvent$(self, _cmd, event);
   if (enabled) {
-    if (!touchWindow) {
-        touchWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, touchSize, touchSize)];
-    }
-    CGRect touchFrame = touchWindow.bounds;
-    touchFrame.size.width = touchFrame.size.height = touchSize;
-    touchWindow.bounds = touchFrame;
-    touchWindow.backgroundColor = touchColor;
-    touchWindow.center = point;
-    touchWindow.windowLevel = UIWindowLevelStatusBar + 10000;
-    touchWindow.userInteractionEnabled = NO;
-    touchWindow.layer.cornerRadius = touchWindow.bounds.size.width / 2;
-    touchWindow.hidden = NO;
-    if (!animatedTouch) {
-      animatedTouch = YES;
-      UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:touchWindow.bounds cornerRadius:touchWindow.layer.cornerRadius];
-      [circleShape removeFromSuperlayer];
-      circleShape = [CAShapeLayer layer];
-      circleShape.bounds = touchWindow.bounds;
-      circleShape.path = path.CGPath;
-      circleShape.position = CGPointMake(touchSize/2, touchSize/2);
-      circleShape.fillColor = rippleColor.CGColor;
-      circleShape.opacity = 0;
-      circleShape.strokeColor = rippleColor.CGColor;
-      circleShape.lineWidth = 0.5;
-      circleShape.anchorPoint = CGPointMake(.5,.5);
-      circleShape.contentsGravity = @"center";
-      if (touchWindow.layer.sublayers.count == 0) {
-        [touchWindow.layer addSublayer:circleShape];
+    if (self != touchWindow) {
+      if (event.type == UIEventTypeTouches) {
+        for(UITouch *touch in [event allTouches]) {
+          CGPoint point = [touch locationInView:nil];
+          if(touch.phase == UITouchPhaseBegan) {
+            if (!touchWindow) {
+                touchWindow = [[UIWindow alloc] initWithFrame:CGRectMake(0, 0, touchSize, touchSize)];
+            }
+            CGRect touchFrame = touchWindow.bounds;
+            touchFrame.size.width = touchFrame.size.height = touchSize;
+            touchWindow.bounds = touchFrame;
+            touchWindow.backgroundColor = touchColor;
+            touchWindow.center = point;
+            touchWindow.windowLevel = UIWindowLevelStatusBar + 100000;
+            touchWindow.userInteractionEnabled = NO;
+            touchWindow.layer.cornerRadius = touchWindow.bounds.size.width / 2;
+            touchWindow.hidden = NO;
+            UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:touchWindow.bounds cornerRadius:touchWindow.layer.cornerRadius];
+            [circleShape removeFromSuperlayer];
+            circleShape = [CAShapeLayer layer];
+            circleShape.bounds = touchWindow.bounds;
+            circleShape.path = path.CGPath;
+            circleShape.position = CGPointMake(touchSize/2, touchSize/2);
+            circleShape.fillColor = rippleColor.CGColor;
+            circleShape.opacity = 0;
+            circleShape.strokeColor = rippleColor.CGColor;
+            circleShape.lineWidth = 0.5;
+            circleShape.anchorPoint = CGPointMake(.5,.5);
+            circleShape.contentsGravity = @"center";
+            if (touchWindow.layer.sublayers.count == 0) {
+              [touchWindow.layer addSublayer:circleShape];
+            }
+            [CATransaction begin];
+            [CATransaction setCompletionBlock:^{
+            }];
+
+            CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
+            scaleAnimation.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+            scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(2, 1, 1)];
+
+            CABasicAnimation *alphaAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
+            alphaAnimation.fromValue = @0.7;
+            alphaAnimation.toValue = @0;
+
+            CAAnimationGroup *animation = [CAAnimationGroup animation];
+            animation.animations = @[scaleAnimation, alphaAnimation];
+            animation.duration = 0.5;
+            animation.repeatCount = 1;
+            animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
+            [circleShape addAnimation:animation forKey:nil];
+            [CATransaction commit];
+          }
+          else if (touch.phase == UITouchPhaseMoved) {
+            touchWindow.center = point;
+            touchWindow.hidden = NO;
+          }
+          else if (touch.phase == UITouchPhaseEnded) {
+            if ([hideTimer isValid]) {
+              [hideTimer invalidate];
+              hideTimer = nil;
+            }
+            hideTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 repeats:NO block:^(NSTimer * _Nonnull timer) {
+              touchWindow.hidden = YES;
+            }];
+          }
+        }
       }
-      [CATransaction begin];
-      [CATransaction setCompletionBlock:^{
-      }];
-
-      CABasicAnimation *scaleAnimation = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-      scaleAnimation.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
-      scaleAnimation.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(2, 1, 1)];
-
-      CABasicAnimation *alphaAnimation = [CABasicAnimation animationWithKeyPath:@"opacity"];
-      alphaAnimation.fromValue = @0.7;
-      alphaAnimation.toValue = @0;
-
-      CAAnimationGroup *animation = [CAAnimationGroup animation];
-      animation.animations = @[scaleAnimation, alphaAnimation];
-      animation.duration = 0.5;
-      animation.repeatCount = 1;
-      animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseOut];
-      [circleShape addAnimation:animation forKey:nil];
-      [CATransaction commit];
     }
-    if ([hideTimer isValid]) {
-      [hideTimer invalidate];
-      hideTimer = nil;
-    }
-    hideTimer = [NSTimer scheduledTimerWithTimeInterval:0.3 repeats:NO block:^(NSTimer * _Nonnull timer) {
-      touchWindow.hidden = YES;
-      animatedTouch = NO;
-     }];
-   }
+  }
 }
 
 
@@ -136,12 +150,12 @@ static void reloadPrefs() {
   touchSize = [prefs objectForKey:@"touchSize"] ? [[prefs objectForKey:@"touchSize"] floatValue] : 30;
 }
 
-static __attribute__((constructor)) void _logosLocalCtor_7bd7f74f(int __unused argc, char __unused **argv, char __unused **envp) {
+static __attribute__((constructor)) void _logosLocalCtor_8c88f8ac(int __unused argc, char __unused **argv, char __unused **envp) {
 	reloadPrefs();
 	reloadColorPrefs();
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadPrefs, kSettingsChangedNotification, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadColorPrefs, kColorChangedNotification, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 }
 static __attribute__((constructor)) void _logosLocalInit() {
-{Class _logos_class$_ungrouped$UITouch = objc_getClass("UITouch"); MSHookMessageEx(_logos_class$_ungrouped$UITouch, @selector(_setLocation:preciseLocation:inWindowResetPreviousLocation:), (IMP)&_logos_method$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$, (IMP*)&_logos_orig$_ungrouped$UITouch$_setLocation$preciseLocation$inWindowResetPreviousLocation$);} }
-#line 119 "Tweak.xm"
+{Class _logos_class$_ungrouped$UIWindow = objc_getClass("UIWindow"); MSHookMessageEx(_logos_class$_ungrouped$UIWindow, @selector(_ignoresHitTest), (IMP)&_logos_method$_ungrouped$UIWindow$_ignoresHitTest, (IMP*)&_logos_orig$_ungrouped$UIWindow$_ignoresHitTest);MSHookMessageEx(_logos_class$_ungrouped$UIWindow, @selector(sendEvent:), (IMP)&_logos_method$_ungrouped$UIWindow$sendEvent$, (IMP*)&_logos_orig$_ungrouped$UIWindow$sendEvent$);} }
+#line 133 "Tweak.xm"
