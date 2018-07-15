@@ -9,12 +9,24 @@
       <key>label</key><string>Settings - they apply on the fly, no respring needed.</string>
     </dict>
 		<dict>
-			<key>cell</key><string>PSSwitchCell</string>
-			<key>default</key><false/>
-			<key>defaults</key><string>com.lnx.showtouch</string>
-			<key>label</key><string>Enable tweak</string>
+			<key>cell</key><string>PSSegmentCell</string>
 			<key>key</key><string>enabled</string>
+			<key>default</key><integer>1</integer>
 			<key>PostNotification</key><string>com.lnx.showtouch/ReloadPrefs</string>
+			<key>label</key><string>Enable tweak</string>
+			<key>defaults</key><string>com.lnx.showtouch</string>
+			<key>validTitles</key>
+			<array>
+				<string>OFF</string>
+				<string>ALWAYS ON</string>
+				<string>JUST WHEN SCREEN RECORD</string>
+			</array>
+			<key>validValues</key>
+			<array>
+				<integer>0</integer>
+				<integer>1</integer>
+				<integer>2</integer>
+			</array>
 		</dict>
 		<dict>
       <key>cell</key><string>PSGroupCell</string>
@@ -29,20 +41,6 @@
         <key>defaults</key><string>com.lnx.showtouch.color</string>
         <key>default</key><string>#ff0000</string>
         <key>key</key><string>touchColor</string>
-        <key>fallback</key><string>#ff0000</string>
-        <key>alpha</key><true/>
-        <key>PostNotification</key><string>com.lnx.showtouch/colorChanged</string>
-      </dict>
-    </dict>
-		<dict>
-      <key>cell</key><string>PSLinkCell</string>
-      <key>cellClass</key><string>PFSimpleLiteColorCell</string>
-      <key>label</key><string>Ripple color</string>
-      <key>libcolorpicker</key>
-      <dict>
-        <key>defaults</key><string>com.lnx.showtouch.color</string>
-        <key>default</key><string>#ff0000</string>
-        <key>key</key><string>rippleColor</string>
         <key>fallback</key><string>#ff0000</string>
         <key>alpha</key><true/>
         <key>PostNotification</key><string>com.lnx.showtouch/colorChanged</string>
