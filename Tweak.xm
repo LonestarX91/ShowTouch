@@ -4,9 +4,6 @@
 #import <SpringBoard/SpringBoard.h>
 #import <Foundation/Foundation.h>
 
-typedef void (^DarwinNotificationBlock)(NSString *identifier);
-
-
 #define kIdentifier @"com.lnx.showtouch"
 #define kSettingsChangedNotification (CFStringRef)@"com.lnx.showtouch/ReloadPrefs"
 #define kScreenRecordChanged (CFStringRef)@"captured"
@@ -33,8 +30,9 @@ static UIColor *touchColor;
 static NSInteger enabled;
 
 static CGFloat touchSize;
-static BOOL receivedAppNotification;
+
 @interface UITouchesEvent : UIEvent
+-(id)_windows;
 @end
 
 @interface UIApplication (STUIApp)
@@ -48,16 +46,6 @@ static BOOL receivedAppNotification;
     dispatch_async(dispatch_get_main_queue(), ^{
 
       SBApplication *currentApplication = [[objc_getClass("SpringBoard") sharedApplication] _accessibilityFrontMostApplication];
-      NSLog(@"APP: %@ - %@", currentApplication, [UIApplication sharedApplication]);
-    // if ([[UIApplication sharedApplication] isKindOfClass:%c(SpringBoard)] && receivedAppNotification) {
-    //
-    //   // CFNotificationCenterRef const center = CFNotificationCenterGetDarwinNotifyCenter();
-    //   // CFNotificationCenterPostNotification(center, NULL, NULL, NULL, TRUE);
-    //
-    // } else {
-      // NSLog(@"touch from sb");
-      // NSLog(@"touch: %@", [(SpringBoard*)[UIApplication sharedApplication] _accessibilityFrontMostApplication]);
-      // NSLog(@"app: %@ - front: %@", [UIApplication sharedApplication], [[UIApplication sharedApplication] respondsToSelector:@selector(_accessibilityFrontMostApplication)] ? @YES : @NO);
 
       NSMutableArray *currentTouches;
       if (@available(iOS 11.0, *)) {
@@ -67,7 +55,6 @@ static BOOL receivedAppNotification;
       }
       if (currentTouches.count == 0) {
         dispatch_async(dispatch_get_main_queue(), ^{
-        receivedAppNotification = NO;
         touchWindow1.hidden = YES;
         touchWindow2.hidden = YES;
         touchWindow3.hidden = YES;
@@ -89,10 +76,25 @@ static BOOL receivedAppNotification;
           touchWindow3 = nil;
         }
 
-        if (!currentApplication && [UIApplication sharedApplication]) {
 
         for (int i = 0; i < currentTouches.count; i++) {
           UITouch *touch = currentTouches[i];
+          NSLog(@"%@ - %@ - %@", currentApplication, [UIApplication sharedApplication], touch.window);
+          BOOL shouldShowTouch = NO;
+          if (@available(iOS 11.0, *)) {
+            NSLog(@"ios 11");
+            shouldShowTouch = YES;
+          }
+          else {
+            NSLog(@"ios 10");
+            if ((!currentApplication && [touch.window isKindOfClass:%c(FBRootWindow)]) || ![touch.window isKindOfClass:%c(FBRootWindow)]) {
+              shouldShowTouch = YES;
+            }
+            else {
+              shouldShowTouch = NO;
+            }
+          }
+          if (shouldShowTouch) {
           CGPoint touchLocation = [[touch valueForKey:@"_locationInWindow"] CGPointValue];
           switch (i) {
             case 0: {
@@ -150,8 +152,7 @@ static BOOL receivedAppNotification;
               break;
           }
         }
-
-        }
+      }
     }
   });
   }
@@ -184,37 +185,12 @@ static void reloadPrefs() {
   touchSize = [prefs objectForKey:@"touchSize"] ? [[prefs objectForKey:@"touchSize"] floatValue] : 30;
 }
 
-// void notificationCallback(CFNotificationCenterRef center, void * observer, CFStringRef name, void const * object, CFDictionaryRef userInfo) {
-//     // NSString *identifier = (__bridge NSString *)name;
-//     NSLog(@"incoming notification: %@", object);
-//     receivedAppNotification = YES;
-// }
-
-// %hook SpringBoard
-// -(void)applicationDidFinishLaunching:(id)application {
-// %orig;
-// NSArray *args = [[NSProcessInfo processInfo] arguments];
-//     if (args != nil && args.count != 0) {
-//         NSString *execPath = args[0];
-//         if (execPath != nil) {
-//             BOOL isSpringBoard = [[execPath lastPathComponent] isEqualToString:@"SpringBoard"];
-//             BOOL isApplication = [execPath rangeOfString:@"/Application"].location != NSNotFound;
-//             if (isSpringBoard && !isApplication) {
-//               CFNotificationCenterRef const center = CFNotificationCenterGetDarwinNotifyCenter();
-//               CFStringRef str = (__bridge CFStringRef)@"touchFromApp";
-//               CFNotificationCenterAddObserver(center, (__bridge const void *)(self), notificationCallback, str, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
-//
-//             }
-//         }
-//     }
-//
-// }
-// %end
 %ctor {
 	reloadPrefs();
 	reloadColorPrefs();
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadPrefs, kSettingsChangedNotification, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadColorPrefs, kColorChangedNotification, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+  NSLog(@"ios 11");
 
   if (enabled == 2) {
     if (@available(iOS 11.0, *)) {
