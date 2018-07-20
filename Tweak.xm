@@ -12,9 +12,10 @@
 
 #define kColorPath @"/var/mobile/Library/Preferences/com.lnx.showtouch.color.plist"
 #define kSettingsPath @"/var/mobile/Library/Preferences/com.lnx.showtouch.plist"
+#define targetImage [UIImage imageWithContentsOfFile:@"/Library/Application Support/ShowTouch/target.png"];
 
 @interface TouchWindow : UIWindow
-@property (nonatomic, strong) NSTimer *hideTimer;
+@property (nonatomic, strong) UIImageView *targetImgv;
 @end
 @implementation TouchWindow
 -(BOOL)_ignoresHitTest {
@@ -101,11 +102,17 @@ static CGFloat touchSize;
               dispatch_async(dispatch_get_main_queue(), ^{
                 if (!touchWindow1) {
                   touchWindow1 = [[TouchWindow alloc] initWithFrame:CGRectMake(touchLocation.x, touchLocation.y, touchSize, touchSize)];
+                  touchWindow1.targetImgv = [[UIImageView alloc] initWithFrame:touchWindow1.bounds];
+                  [touchWindow1 addSubview:touchWindow1.targetImgv];
+                  touchWindow1.targetImgv.contentMode = UIViewContentModeScaleAspectFill;
+                  touchWindow1.targetImgv.image = targetImage;
+                  touchWindow1.targetImgv.image = [touchWindow1.targetImgv.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 }
                 CGRect touchFrame = touchWindow1.bounds;
                 touchFrame.size.width = touchFrame.size.height = touchSize;
                 touchWindow1.bounds = touchFrame;
-                touchWindow1.backgroundColor = touchColor;
+                // touchWindow1.backgroundColor = touchColor;
+                touchWindow1.targetImgv.tintColor = touchColor;
                 touchWindow1.center = CGPointMake(touchLocation.x, touchLocation.y);
                 touchWindow1.windowLevel = UIWindowLevelStatusBar + 100000;
                 touchWindow1.userInteractionEnabled = NO;
@@ -118,11 +125,17 @@ static CGFloat touchSize;
               dispatch_async(dispatch_get_main_queue(), ^{
                 if (!touchWindow2) {
                   touchWindow2 = [[TouchWindow alloc] initWithFrame:CGRectMake(touchLocation.x, touchLocation.y, touchSize, touchSize)];
+                  touchWindow2.targetImgv = [[UIImageView alloc] initWithFrame:touchWindow2.bounds];
+                  [touchWindow2 addSubview:touchWindow2.targetImgv];
+                  touchWindow2.targetImgv.contentMode = UIViewContentModeScaleAspectFill;
+                  touchWindow2.targetImgv.image = targetImage;
+                  touchWindow2.targetImgv.image = [touchWindow2.targetImgv.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 }
                 CGRect touchFrame = touchWindow2.bounds;
                 touchFrame.size.width = touchFrame.size.height = touchSize;
                 touchWindow2.bounds = touchFrame;
-                touchWindow2.backgroundColor = touchColor;
+                // touchWindow2.backgroundColor = touchColor;
+                touchWindow2.targetImgv.tintColor = touchColor;
                 touchWindow2.center = CGPointMake(touchLocation.x, touchLocation.y);
                 touchWindow2.windowLevel = UIWindowLevelStatusBar + 100000;
                 touchWindow2.userInteractionEnabled = NO;
@@ -135,11 +148,17 @@ static CGFloat touchSize;
               dispatch_async(dispatch_get_main_queue(), ^{
                 if (!touchWindow3) {
                   touchWindow3 = [[TouchWindow alloc] initWithFrame:CGRectMake(touchLocation.x, touchLocation.y, touchSize, touchSize)];
+                  touchWindow3.targetImgv = [[UIImageView alloc] initWithFrame:touchWindow3.bounds];
+                  [touchWindow3 addSubview:touchWindow3.targetImgv];
+                  touchWindow3.targetImgv.contentMode = UIViewContentModeScaleAspectFill;
+                  touchWindow3.targetImgv.image = targetImage;
+                  touchWindow3.targetImgv.image = [touchWindow3.targetImgv.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 }
                 CGRect touchFrame = touchWindow3.bounds;
                 touchFrame.size.width = touchFrame.size.height = touchSize;
                 touchWindow3.bounds = touchFrame;
-                touchWindow3.backgroundColor = touchColor;
+                // touchWindow3.backgroundColor = touchColor;
+                touchWindow3.targetImgv.tintColor = touchColor;
                 touchWindow3.center = CGPointMake(touchLocation.x, touchLocation.y);
                 touchWindow3.windowLevel = UIWindowLevelStatusBar + 100000;
                 touchWindow3.userInteractionEnabled = NO;

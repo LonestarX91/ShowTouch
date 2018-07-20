@@ -11,6 +11,10 @@ ShowTouch_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 
+after-ShowTouch-stage::
+	mkdir -p $(THEOS_STAGING_DIR)/Library/Application\ Support/ShowTouch
+	cp -r Resources/ $(THEOS_STAGING_DIR)/Library/Application\ Support/ShowTouch
+
 after-install::
 	install.exec "killall -9 SpringBoard"
 SUBPROJECTS += showtouch
